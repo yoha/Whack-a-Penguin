@@ -14,6 +14,8 @@ class WhackSlot: SKNode {
     // MARK: - Stored Properties
     
     var penguineImageSpriteNode: SKSpriteNode!
+    var isPenguinVisible = false
+    var isPenguinHit = false
     
     // MARK: - Local Methods
     
@@ -34,5 +36,31 @@ class WhackSlot: SKNode {
         
         croppingMaskNodeToHidePenguin.addChild(self.penguineImageSpriteNode)
         self.addChild(croppingMaskNodeToHidePenguin)
+    }
+    
+    func showPenguin(hideTime hideTime: Double) {
+        if self.isPenguinVisible { return }
+        
+        self.penguineImageSpriteNode.runAction(SKAction.moveByX(0, y: 80, duration: 0.05))
+        self.isPenguinVisible = true
+        self.isPenguinHit = false
+        
+        if RandomInt(min: 0, max: 2) == 0 {
+            self.penguineImageSpriteNode.texture = SKTexture(imageNamed: "penguinGood")
+            self.penguineImageSpriteNode.name = "charFriend"
+        }
+        else {
+            self.penguineImageSpriteNode.texture = SKTexture(imageNamed: "penguinEvil")
+            self.penguineImageSpriteNode.name = "charEnemy"
+        }
+        
+        runAfterDelay(hideTime * 3.5, block: { [unowned self] in self.hidePenguin() })
+    }
+    
+    func hidePenguin() {
+        if !self.isPenguinVisible { return }
+        
+        self.penguineImageSpriteNode.runAction(SKAction.moveByX(0, y: -80, duration: 0.05))
+        self.isPenguinVisible = false
     }
 }
