@@ -15,6 +15,7 @@ class GameScene: SKScene {
     var gameScoreLabelNode: SKLabelNode!
     var whackSlotArray = [WhackSlot]()
     var penguinPopupTime = 0.85
+    var numberOfGameRounds = 0
     
     // MARK: - Computed Properties
     
@@ -50,7 +51,35 @@ class GameScene: SKScene {
     }
     
     override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-       /* Called when a touch begins */
+        let touch = touches.first!
+        let touchLocation = touch.locationInNode(self)
+        let nodes = self.nodesAtPoint(touchLocation)
+        
+        for node in nodes {
+            if node.name == "charFriend" {
+                let whackSlotTapped = node.parent!.parent! as! WhackSlot
+                if !whackSlotTapped.isPenguinVisible { continue }
+                if whackSlotTapped.isPenguinHit { continue }
+                
+                whackSlotTapped.hitPenguin()
+                self.gameScore -= 5
+                
+                self.runAction(SKAction.playSoundFileNamed("whackBad.caf", waitForCompletion: false))
+            }
+            else if node.name == "charEnemy" {
+                let whackSlotTapped = node.parent!.parent! as! WhackSlot
+                if !whackSlotTapped.isPenguinVisible { continue }
+                if whackSlotTapped.isPenguinHit { continue }
+                
+                whackSlotTapped.penguineImageSpriteNode.xScale = 0.85
+                whackSlotTapped.penguineImageSpriteNode.yScale = 0.85
+                
+                whackSlotTapped.hitPenguin()
+                ++self.gameScore
+                
+                self.runAction(SKAction.playSoundFileNamed("whack.caf", waitForCompletion: false))
+            }
+        }
 
     }
    
@@ -69,6 +98,19 @@ class GameScene: SKScene {
     
     func createPenguin() {
         self.penguinPopupTime *= 0.991
+        
+        ++self.numberOfGameRounds
+        
+        if self.numberOfGameRounds >= 30 {
+            for slot in self.whackSlotArray { slot.hidePenguin() }
+            
+            let gameOver = SKSpriteNode(imageNamed: "gameOver")
+            gameOver.position = CGPoint(x: 512, y: 384)
+            self.addChild(gameOver)
+            
+            return
+        }
+        
         self.whackSlotArray.shuffle()
         self.whackSlotArray.first?.showPenguin(hideTime: self.penguinPopupTime)
         

@@ -41,6 +41,9 @@ class WhackSlot: SKNode {
     func showPenguin(hideTime hideTime: Double) {
         if self.isPenguinVisible { return }
         
+        self.penguineImageSpriteNode.xScale = 1.0
+        self.penguineImageSpriteNode.yScale = 1.0
+        
         self.penguineImageSpriteNode.runAction(SKAction.moveByX(0, y: 80, duration: 0.05))
         self.isPenguinVisible = true
         self.isPenguinHit = false
@@ -62,5 +65,14 @@ class WhackSlot: SKNode {
         
         self.penguineImageSpriteNode.runAction(SKAction.moveByX(0, y: -80, duration: 0.05))
         self.isPenguinVisible = false
+    }
+    
+    func hitPenguin() {
+        self.isPenguinHit = true
+        
+        let delay = SKAction.waitForDuration(0.25)
+        let hidePenguin = SKAction.moveByX(0, y: -80, duration: 0.5)
+        let notVisible = SKAction.runBlock({ [unowned self] in self.isPenguinVisible = false })
+        self.penguineImageSpriteNode.runAction(SKAction.sequence([delay, hidePenguin, notVisible]))
     }
 }
